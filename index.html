@@ -271,6 +271,15 @@
     margin: 20px 0;
     border: none;
   }
+  #shatterCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
 </style>
 </head>
 <body>
@@ -440,26 +449,137 @@
 </footer>
 
 <script>
-  function enterBrutus() {
+const canvas = document.getElementById("shatterCanvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+// Create shards
+function createShards(img) {
+  const shards = [];
+  const rows = 8;
+  const cols = 10;
+
+  const w = canvas.width / cols;
+  const h = canvas.height / rows;
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      shards.push({
+        x: x * w,
+        y: y * h,
+        w: w,
+        h: h,
+        dx: (Math.random() - 0.5) * 20,
+        dy: (Math.random() - 0.5) * 20,
+        rot: Math.random() * 360,
+        dr: (Math.random() - 0.5) * 10,
+        opacity: 1
+      });
+    }
+  }
+  return shards;
+}
+
+function drawShards(img, shards) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  shards.forEach(s => {
+    ctx.save();
+    ctx.globalAlpha = s.opacity;
+    ctx.translate(s.x + s.w/2, s.y + s.h/2);
+    ctx.rotate(s.rot * Math.PI / 180);
+
+    ctx.drawImage(
+      img,
+      s.x, s.y, s.w, s.h,
+      -s.w/2, -s.h/2, s.w, s.h
+    );
+
+    ctx.restore();
+  });
+}
+
+function animateShatter(img, shards, callback) {
+  let frame = 0;
+
+  function animate() {
+    frame++;
+    shards.forEach(s => {
+      s.x += s.dx;
+      s.y += s.dy + frame * 0.05;
+      s.rot += s.dr;
+      s.opacity -= 0.015;
+    });
+
+    drawShards(img, shards);
+
+    if (frame < 60) {
+      requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      callback();
+    }
+  }
+
+  animate();
+}
+
+// Capture screen → shatter
+function shatterTransition(callback) {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+
+  // Screenshot using SVG trick (lightweight alternative to html2canvas)
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${window.innerWidth}" height="${window.innerHeight}">
+      <foreignObject width="100%" height="100%">
+        ${new XMLSerializer().serializeToString(document.body)}
+      </foreignObject>
+    </svg>
+  `;
+
+  const blob = new Blob([svg], {type: "image/svg+xml;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+
+  img.onload = function () {
+    const shards = createShards(img);
+    animateShatter(img, shards, callback);
+    URL.revokeObjectURL(url);
+  };
+
+  img.src = url;
+}
+
+
+// 🔹 MODIFIED FUNCTIONS
+
+function enterBrutus() {
+  shatterTransition(() => {
     document.body.classList.add('brutus-mode');
     document.getElementById('mainPanel').style.display = 'none';
     document.getElementById('brutusPanel').classList.add('active');
     document.getElementById('headerTitle').textContent = 'Marcus Junius Brutus';
     document.getElementById('headerSub').innerHTML = '<em>Character Study — Julius Caesar</em>';
-    document.getElementById('headerTag').textContent = 'Blue & Silver Edition';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+    window.scrollTo({ top: 0 });
+  });
+}
 
-  function exitBrutus() {
-    document.body.classList.remove('brutus-mode');
-    document.getElementById('mainPanel').style.display = 'block';
-    document.getElementById('brutusPanel').classList.remove('active');
-    document.getElementById('headerTitle').textContent = 'Dramaturgical Notebook';
-    document.getElementById('headerSub').innerHTML = '<em>William Shakespeare\'s Julius Caesar</em>';
-    document.getElementById('headerTag').textContent = 'Complete Edition';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+function exitBrutus() {
+  document.body.classList.remove('brutus-mode');
+  document.getElementById('mainPanel').style.display = 'block';
+  document.getElementById('brutusPanel').classList.remove('active');
+  document.getElementById('headerTitle').textContent = 'Dramaturgical Notebook';
+  document.getElementById('headerSub').innerHTML = '<em>William Shakespeare\\'s Julius Caesar</em>';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 </script>
-
+</script>
+<canvas id="shatterCanvas"></canvas>
 </body>
 </html>
