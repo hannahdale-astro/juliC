@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dramaturgical Notebook – Julius Caesar</title>
+<style>
+  :root {
+    --gold: #c9a66b;
+    --crimson: #5a0f0f;
+    --parchment: #f4ecd8;
+    --ink: #45413f;
+    --note-bg: #efe3c2;
+    --brutus-note: #dce5f2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Garamond", "Georgia", serif;
+    background: var(--parchment);
+    color: var(--ink);
+    transition: background 0.6s ease, color 0.6s ease;
+  }
+
+  body.brutus-mode {
+    background: #f0f4fb;
+    color: #1a2a40;
+  }
+
+  header {
+    background: var(--crimson);
+    color: #f8f1e5;
+    padding: 36px 24px 28px;
+    text-align: center;
+    border-bottom: 5px solid var(--gold);
+    transition: background 0.6s ease, border-color 0.6s ease;
+    position: relative;
+  }
+
+  body.brutus-mode header {
+    background: linear-gradient(135deg, #0d2247 0%, #1a3a6b 60%, #2a5298 100%);
+    border-bottom-color: #8a9ab5;
+  }
+
+  header h1 {
+    font-size: 2.4em;
+    letter-spacing: 3px;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.5s;
+  }
+
+  header p { font-style: italic; margin-top: 6px; opacity: 0.85; font-size: 1.05em; }
+
+  .nb-subtitle {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 18px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  .back-btn {
+    display: none;
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 6px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    transition: background 0.2s;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.28); }
+  body.brutus-mode .back-btn { display: block; }
+
+  nav {
+    background: var(--crimson);
+    padding: 10px;
+    text-align: center;
+    transition: background 0.6s;
+  }
+  body.brutus-mode nav {
+    background: #0d2247;
+  }
+  nav a {
+    color: #f4ecd8;
+    margin: 0 14px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+  }
+  nav a:hover { text-decoration: underline; }
+
+  section {
+    padding: 36px 40px;
+    border-bottom: 2px solid var(--gold);
+    transition: border-color 0.6s;
+    animation: fadeIn 0.5s ease;
+  }
+  body.brutus-mode section {
+    border-bottom-color: #8a9ab5;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  section h2 {
+    font-size: 1.5em;
+    border-left: 8px solid var(--crimson);
+    padding-left: 12px;
+    margin-bottom: 16px;
+    transition: border-color 0.6s, color 0.6s;
+  }
+  body.brutus-mode section h2 {
+    border-left-color: #4a6fa5;
+    color: #0d2247;
+  }
+
+  section h3 {
+    font-size: 1.15em;
+    margin: 18px 0 6px;
+  }
+
+  .quote {
+    font-style: italic;
+    background: #fff8e7;
+    padding: 14px 18px;
+    border-left: 5px solid var(--gold);
+    margin: 18px 0;
+    border-radius: 0 4px 4px 0;
+    transition: background 0.6s, border-color 0.6s;
+  }
+  body.brutus-mode .quote {
+    background: #dce8f7;
+    border-left-color: #4a6fa5;
+    color: #0d2247;
+  }
+
+  .note {
+    background: var(--note-bg);
+    padding: 14px 16px;
+    margin-top: 14px;
+    border-left: 5px solid var(--crimson);
+    border-radius: 0 4px 4px 0;
+    font-size: 0.97em;
+    transition: background 0.6s, border-color 0.6s;
+  }
+  body.brutus-mode .note {
+    background: var(--brutus-note);
+    border-left-color: #4a6fa5;
+    color: #1a2a40;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    background: var(--crimson);
+    color: #f4ecd8;
+    font-style: italic;
+    transition: background 0.6s;
+  }
+  body.brutus-mode footer {
+    background: #0d2247;
+  }
+
+  ul.nb-list {
+    padding-left: 22px;
+    line-height: 2;
+  }
+
+  .char-entry { margin-bottom: 14px; }
+
+  .char-name { font-weight: bold; font-size: 1.05em; }
+
+  .char-name.clickable {
+    cursor: pointer;
+    color: #7a1a1a;
+    text-decoration: underline dotted;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+  body.brutus-mode .char-name.clickable {
+    color: #1a3a6b;
+  }
+  .char-name.clickable:hover {
+    color: var(--gold);
+    text-shadow: 0 0 6px rgba(201,166,107,0.5);
+  }
+  body.brutus-mode .char-name.clickable:hover {
+    color: #4a6fa5;
+    text-shadow: 0 0 6px rgba(74,111,165,0.4);
+  }
+
+  #brutusPanel { display: none; }
+  #brutusPanel.active { display: block; animation: fadeIn 0.55s ease; }
+
+  .brutus-portrait {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #e8eef7, #dce8f7);
+    border-radius: 8px;
+    border: 1px solid #8a9ab5;
+  }
+  .brutus-bust {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a3a6b, #4a6fa5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px #8a9ab5;
+  }
+  .brutus-bust svg { width: 44px; height: 44px; }
+  .brutus-bio { flex: 1; }
+  .brutus-bio h3 { font-size: 1.4em; color: #0d2247; margin-bottom: 4px; }
+  .brutus-bio p { font-size: 0.93em; color: #2a4a7a; line-height: 1.6; }
+
+  .brutus-traits {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .trait-badge {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.82em;
+    letter-spacing: 0.5px;
+    background: #c8d8f0;
+    color: #0d2247;
+    border: 1px solid #8a9ab5;
+  }
+
+  .brutus-scenes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .scene-card {
+    background: #fff;
+    border: 1px solid #8a9ab5;
+    border-radius: 8px;
+    padding: 14px;
+    border-top: 4px solid #4a6fa5;
+  }
+  .scene-card h4 { font-size: 0.9em; color: #4a6fa5; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .scene-card p { font-size: 0.88em; color: #2a3a5a; line-height: 1.5; }
+
+  .silver-divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #8a9ab5, #c0c8d8, #8a9ab5, transparent);
+    margin: 20px 0;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="exitBrutus()">← Back to Play</button>
+  <h1 id="headerTitle">Dramaturgical Notebook</h1>
+  <p id="headerSub"><em>William Shakespeare's Julius Caesar</em></p>
+  <span class="nb-subtitle" id="headerTag">Complete Edition</span>
+</header>
+
+<nav>
+  <a href="#ctx">Context</a>
+  <a href="#chars">Characters</a>
+  <a href="#themes">Themes</a>
+  <a href="#scenes">Key Scenes</a>
+  <a href="#staging">Staging</a>
+  <a href="#refs">References</a>
+</nav>
+
+<!-- MAIN PANEL -->
+<div id="mainPanel">
+
+  <section id="ctx">
+    <h2>Historical Context</h2>
+    <p><em>Julius Caesar</em> was written around 1599, during the reign of Queen Elizabeth I — a time of political uncertainty surrounding succession. Shakespeare draws on Roman history to explore tensions between republicanism and authoritarian rule. Although set in ancient Rome, the play reflects anxieties familiar to Elizabethan audiences: fears of tyranny, the fragility of democracy, and the consequences of political violence. The question of whether it is ever justified to remove a leader "for the good of the state" would have resonated deeply in a society wary of rebellion but uncertain about the future.</p>
+  </section>
+
+  <section id="chars">
+    <h2>Major Characters</h2>
+    <div class="char-entry">
+      <span class="char-name">Julius Caesar:</span> A powerful leader whose ambition sparks fear in his counsel.
+    </div>
+    <div class="char-entry">
+      <span class="char-name clickable" onclick="enterBrutus()">Brutus</span><span>: An honorable Roman torn between loyalty and republican ideals. <em style="font-size:0.85em;opacity:0.6;">(click to explore)</em></span>
+    </div>
+    <div class="char-entry">
+      <span class="char-name">Cassius:</span> A manipulative conspirator driven by envy.
+    </div>
+    <div class="char-entry">
+      <span class="char-name">Mark Antony:</span> Loyal to Caesar and politically intelligent.
+    </div>
+    <div class="note">
+      <strong>Insight:</strong> Brutus is often considered the tragic hero rather than Caesar.
+    </div>
+  </section>
+
+  <section id="themes">
+    <h2>Themes</h2>
+    <ul class="nb-list">
+      <li>Power and ambition</li>
+      <li>Fate vs. free will</li>
+      <li>Public vs. private self</li>
+      <li>Rhetoric and persuasion</li>
+    </ul>
+    <div class="quote">"The fault, dear Brutus, is not in our stars, but in ourselves."</div>
+    <div class="note">At its core, <em>Julius Caesar</em> examines the nature of power and the moral ambiguity of political action. One central theme is the conflict between fate and free will — characters frequently interpret omens and dreams, yet still make choices that lead to their downfall. The play also explores rhetoric and persuasion, particularly how language can shape public opinion, as seen in Brutus's and Antony's speeches. Friendship versus duty is another key theme, especially in Brutus's internal struggle. Ultimately, the play suggests that attempts to control political outcomes often unleash unintended chaos.</div>
+  </section>
+
+  <section id="scenes">
+    <h2>Key Scenes</h2>
+    <h3>Act 1, Scene 3</h3>
+    <p>Storm scene where Cassius and Casca meet.</p>
+    <h3>Act 3, Scene 1</h3>
+    <p>Caesar's assassination — the turning point of the play.</p>
+    <div class="quote">"Et tu, Brute?"</div>
+    <h3>Act 3, Scene 2</h3>
+    <p>Funeral speeches by Brutus and Antony.</p>
+    <div class="note">Antony's speech demonstrates the power of rhetoric in shaping public opinion.</div>
+    <h3 style="margin-top:18px;">Overview</h3>
+    <p style="margin-top:6px;">Several scenes serve as pivotal turning points. The assassination in Act III, Scene I is the dramatic and moral climax, where the conspirators' ideals collide with brutal action. Immediately following, the funeral speeches (Act III, Scene II) demonstrate the power of rhetoric, as Antony skillfully turns public sentiment against the conspirators. Earlier, the storm scene (Act I, Scene III) establishes an atmosphere of unrest and foreshadows the upheaval of Caesar's Rome.</p>
+  </section>
+
+  <section id="staging">
+    <h2>Staging & Design Ideas</h2>
+    <ul class="nb-list">
+      <li>Use stark lighting to emphasize moral conflict.</li>
+      <li>Roman-inspired costumes with modern political elements.</li>
+      <li>Projected text or imagery during speeches.</li>
+    </ul>
+    <div class="note">Consider a minimalist set to focus attention on language and performance.</div>
+  </section>
+
+  <section id="refs">
+    <h2>References</h2>
+    <ul class="nb-list" style="font-size:0.9em;line-height:1.9;">
+      <li>Bevington, David, and Terence John. "William Shakespeare - Julius Caesar." <em>Encyclopædia Britannica</em>, 20 Oct. 2018, www.britannica.com/biography/William-Shakespeare/Julius-Caesar.</li>
+      <li>Caesar, Julius. "Julius Caesar: A Guide - History." Google.com, 2026, sites.google.com/view/juliuscaesar-a-guide/history?authuser=0. Accessed 8 Apr. 2026.</li>
+      <li>Morrill, John S, and Stephen J Greenblatt. "Elizabeth I | Biography, Facts, Mother, & Death." <em>Encyclopedia Britannica</em>, 2 Nov. 2018, www.britannica.com/biography/Elizabeth-I.</li>
+      <li>Shakespeare, William. <em>Julius Caesar</em>. 1599.</li>
+    </ul>
+  </section>
+
+</div>
+
+<!-- BRUTUS PANEL -->
+<div id="brutusPanel">
+
+  <section>
+    <h2>Marcus Junius Brutus</h2>
+    <div class="brutus-portrait">
+      <div class="brutus-bust">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="14" r="9" fill="#c8d8f0" opacity="0.9"/>
+          <ellipse cx="22" cy="36" rx="13" ry="9" fill="#c8d8f0" opacity="0.7"/>
+          <circle cx="22" cy="14" r="6" fill="#8a9ab5"/>
+          <path d="M10 30 Q22 22 34 30" stroke="#8a9ab5" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="brutus-bio">
+        <h3>The Honorable Conspirator</h3>
+        <p>Widely regarded as the play's true tragic hero. A man of deep principle and fatal idealism — his nobility becomes the instrument of his destruction. Caesar's closest friend; Rome's most reluctant assassin.</p>
+      </div>
+    </div>
+
+    <div class="brutus-traits">
+      <span class="trait-badge">Honorable</span>
+      <span class="trait-badge">Idealistic</span>
+      <span class="trait-badge">Conflicted</span>
+      <span class="trait-badge">Stoic</span>
+      <span class="trait-badge">Rhetorically Skilled</span>
+      <span class="trait-badge">Fatally Naive</span>
+    </div>
+
+    <hr class="silver-divider"/>
+
+    <div class="quote">"Not that I loved Caesar less, but that I loved Rome more."<br><span style="font-size:0.82em;opacity:0.7;">— Act III, Scene II</span></div>
+
+    <div class="note">
+      <strong>Dramaturgical Note:</strong> Brutus presents a unique challenge for the actor: he must be simultaneously sympathetic and culpable. His oration at Caesar's funeral is measured and rational — which is exactly why Antony's emotional appeal eclipses it. Brutus trusts logic and honor in a world that runs on passion and power.
+    </div>
+
+    <hr class="silver-divider" style="margin-top:20px;"/>
+
+    <h3 style="margin-bottom:12px; color:#0d2247;">Key Scenes Involving Brutus</h3>
+    <div class="brutus-scenes">
+      <div class="scene-card">
+        <h4>Act II, Scene I</h4>
+        <p>The orchard soliloquy. Brutus reasons alone through the morality of assassination — his most intimate and revealing moment.</p>
+      </div>
+      <div class="scene-card">
+        <h4>Act III, Scene I</h4>
+        <p>The assassination. Brutus strikes last — a symbolic act of both betrayal and devotion to the republic.</p>
+      </div>
+      <div class="scene-card">
+        <h4>Act III, Scene II</h4>
+        <p>The funeral speech. Brutus appeals to reason; Antony appeals to the heart. The contrast is the hinge of the play.</p>
+      </div>
+      <div class="scene-card">
+        <h4>Act V, Scene V</h4>
+        <p>Death at Philippi. Antony's eulogy — "This was the noblest Roman of them all" — restores Brutus's dignity in death.</p>
+      </div>
+    </div>
+
+    <hr class="silver-divider"/>
+
+    <div class="note">
+      <strong>Staging thought:</strong> Consider blue-silver wash lighting for every Brutus scene to distinguish his interior world from the warmer, power-saturated Rome of Caesar and Antony. His costume might subtly echo classical Republican iconography — understated against the imperial richness of others.
+    </div>
+
+    <div class="quote" style="margin-top:20px;">"This was the noblest Roman of them all."<br><span style="font-size:0.82em;opacity:0.7;">— Mark Antony, Act V, Scene V</span></div>
+  </section>
+
+</div>
+
+<footer>
+  <p>Created as a Dramaturgical Exploration by Hannah Alberti</p>
+</footer>
+
+<script>
+  function enterBrutus() {
+    document.body.classList.add('brutus-mode');
+    document.getElementById('mainPanel').style.display = 'none';
+    document.getElementById('brutusPanel').classList.add('active');
+    document.getElementById('headerTitle').textContent = 'Marcus Junius Brutus';
+    document.getElementById('headerSub').innerHTML = '<em>Character Study — Julius Caesar</em>';
+    document.getElementById('headerTag').textContent = 'Blue & Silver Edition';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function exitBrutus() {
+    document.body.classList.remove('brutus-mode');
+    document.getElementById('mainPanel').style.display = 'block';
+    document.getElementById('brutusPanel').classList.remove('active');
+    document.getElementById('headerTitle').textContent = 'Dramaturgical Notebook';
+    document.getElementById('headerSub').innerHTML = '<em>William Shakespeare\'s Julius Caesar</em>';
+    document.getElementById('headerTag').textContent = 'Complete Edition';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
